@@ -1,4 +1,5 @@
 const express = require('express');
+const da = require("./data-access");
 const path = require('path');  // for handling file paths
 
 const app = express();
@@ -11,4 +12,9 @@ app.use(express.static(staticDir));
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
   console.log("staticDir: " + staticDir);
+});
+
+app.get("/customers", async (req, res) => {
+    const cust = await da.getCustomers();
+    res.send(cust);    
 });
