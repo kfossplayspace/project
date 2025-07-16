@@ -1,6 +1,6 @@
 const express = require('express');
 const da = require("./data-access");
-const path = require('path');  // for handling file paths
+const path = require('path'); 
 
 const app = express();
 const port = process.env.PORT || 4000;  // use env var or default to 4000
@@ -15,6 +15,11 @@ app.listen(port, () => {
 });
 
 app.get("/customers", async (req, res) => {
-    const cust = await da.getCustomers();
-    res.send(cust);    
+    const [cust, err] = await da.getCustomers();
+    if(cust){
+        res.send(cust);
+    }else{
+        res.status(500);
+        res.send(err);
+    }   
 });
