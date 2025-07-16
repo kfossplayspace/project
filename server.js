@@ -2,7 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const da = require("./data-access");
 const path = require('path'); 
-
+const checkApiKey = require("./security").checkApiKey;
+const getNewApiKey = require("./security").getNewApiKey;
 const app = express();
 const port = process.env.PORT || 4000;  // use env var or default to 4000
 
@@ -16,6 +17,18 @@ app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
   console.log("staticDir: " + staticDir);
 });
+
+app.get("/apikey", async (req, res) => {
+    let email = req.query.email;
+    if(email){
+        const newApiKey = getNewApiKey(email);
+        res.send(newApiKey);
+    }else{
+        res.status(400);
+        res.send("an email query param is required");
+    }   
+});
+
 
 app.get("/customers", async (req, res) => {
     const [cust, err] = await da.getCustomers();
