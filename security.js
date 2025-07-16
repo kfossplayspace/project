@@ -1,23 +1,4 @@
-var crypto = require('crypto');
-
-
-let apiKey = "abcde";
-//let apiKey = null;
-let apiKeys = new Map();
-
-function getNewApiKey(email){
-  let newApiKey = crypto.randomBytes(6).toString('hex');
-  apiKeys.set(email, newApiKey);
-  displayApiKeys();
-  return newApiKey;
-}
-
-function displayApiKeys(){
-  console.log("apiKeys:");
-  for(let entry of apiKeys.entries()){
-    console.log(entry)
-  }
-}
+let apiKey = null;
 
 function setApiKey(){
   apiKey = process.env.API_KEY;
@@ -27,8 +8,7 @@ function setApiKey(){
       }
   }
   if(apiKey && apiKey.length >0){
-      apiKeys.set("default", apiKey );
-      displayApiKeys();
+      console.log("api-key: " + apiKey );
   }else{
       console.log("apiKey has no value. Please provide a value through the API_KEY env var or --api-key cmd line parameter.");
       process.exit(0);
@@ -44,13 +24,8 @@ function checkApiKey(req, res, next) {
     }
   
     // Compare the received key with the stored key (from environment variable or configuration file)
-    let keyValid = false;    
-    for( let value of apiKeys.values()){
-      if (apiKeyHeader === value){
-        keyValid = true;
-      }
-    }
-    if (!keyValid ) {
+    //if (apiKeyHeader !== process.env.API_KEY) {
+    if (apiKeyHeader !== apiKey ) {
       return res.status(403).json({ message: 'Forbidden: Invalid API key' });
     }
   
@@ -60,4 +35,8 @@ function checkApiKey(req, res, next) {
   
   setApiKey();
   
-  module.exports = {setApiKey, checkApiKey, getNewApiKey};
+  module.exports = {setApiKey, checkApiKey};
+
+
+  
+  
