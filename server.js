@@ -17,6 +17,19 @@ app.listen(port, () => {
   console.log("staticDir: " + staticDir);
 });
 
+app.get("/apikey", async (req, res) => {
+    let email = req.query.email;
+    if(email){
+        const newApiKey = getNewApiKey(email);
+        res.send(newApiKey);
+    }else{
+        res.status(400);
+        res.send("an email query param is required");
+    }   
+});
+
+
+
 app.get("/customers", checkApiKey, async (req, res) => {
     const [cust, err] = await da.getCustomers();
     if(cust){
@@ -37,6 +50,34 @@ app.get("/customers/:id", async (req, res) => {
         res.send(err);
     }   
 });
+
+app.get("/customers/find/", async (req, res) => {
+    let id = +req.query.id;
+    let email = req.query.email;
+    let password = req.query.password;
+    let query = null;
+    if (id > -1) {
+        query = { "id": id };
+    } else if (email) {
+        query = { "email": email };
+    } else if (password) {
+        query = { "password": password }
+    }
+    if (query) {
+        const [customers, err] = await da.findCustomers(query);
+        if (customers) {
+            res.send(customers);
+        } else {
+            res.status(404);
+            res.send(err);
+        }
+    } else {
+        res.status(400);
+        res.send("query string is required");
+    }
+});
+
+
 
 app.get("/reset", async (req, res) => {
     const [result, err] = await da.resetCustomers();
