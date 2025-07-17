@@ -16,7 +16,7 @@ function setApiKey(){
 }
 
 function checkApiKey(req, res, next) {
-    const apiKeyHeader = req.headers['x-api-key']; // Assuming the API key is sent in the header named 'x-api-key'
+    const apiKeyHeader = req.headers['x-api-key'] ||req.query.api_key;  // Assuming the API key is sent in the header named 'x-api-key'
   
     // Check if API key is present
     if (!apiKeyHeader) {
