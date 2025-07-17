@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const da = require("./data-access");
 const path = require('path'); 
 const checkApiKey = require("./security").checkApiKey;
+const getNewApiKey = require("./security").getNewApiKey;
 const app = express();
 const port = process.env.PORT || 4000;  // use env var or default to 4000
 
