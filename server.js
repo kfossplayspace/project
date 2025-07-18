@@ -29,6 +29,38 @@ app.get("/apikey", async (req, res) => {
     }   
 });
 
+app.get("/reset", async (req, res) => {
+    const [result, err] = await da.resetCustomers();
+    if(result){
+        res.send(result);
+    }else{
+        res.status(500);
+        res.send(err);
+    }   
+});
+
+app.get("/customers/find", async (req, res) => {
+  const keys = Object.keys(req.query);
+
+  // Require exactly one query string field
+  if (keys.length === 0) {
+    return res.status(400).send("query string is required");
+  }
+  if (keys.length > 1) {
+    return res.status(400).send("only one query field is allowed");
+  }
+
+  const field = keys[0];
+  const value = req.query[field];
+
+  const [results, err] = await da.findCustomers(field, value);
+
+  if (results) {
+    res.send(results);
+  } else {
+    res.status(400).send({ error: err });
+  }
+});
 
 
 app.get("/customers", checkApiKey, async (req, res) => {
@@ -48,44 +80,6 @@ app.get("/customers/:id", async (req, res) => {
         res.send(cust);
     }else{
         res.status(404);
-        res.send(err);
-    }   
-});
-
-app.get("/customers/find/", async (req, res) => {
-    let id = +req.query.id;
-    let email = req.query.email;
-    let password = req.query.password;
-    let query = null;
-    if (id > -1) {
-        query = { "id": id };
-    } else if (email) {
-        query = { "email": email };
-    } else if (password) {
-        query = { "password": password }
-    }
-    if (query) {
-        const [customers, err] = await da.findCustomers(query);
-        if (customers) {
-            res.send(customers);
-        } else {
-            res.status(404);
-            res.send(err);
-        }
-    } else {
-        res.status(400);
-        res.send("query string is required");
-    }
-});
-
-
-
-app.get("/reset", async (req, res) => {
-    const [result, err] = await da.resetCustomers();
-    if(result){
-        res.send(result);
-    }else{
-        res.status(500);
         res.send(err);
     }   
 });
@@ -140,3 +134,5 @@ app.delete("/customers/:id", async (req, res) => {
         res.send(errMessage);
     }
 });
+
+
